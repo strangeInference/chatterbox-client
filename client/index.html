@@ -15,10 +15,13 @@
   <body>
     <div id="main">
       <h1>chatterbox</h1>
-      <input list="roomList" name="myRoom" id="myRoom" value="">
-      <datalist id="roomList">
-      </datalist>
-      <textarea id="messageBox"></textarea>
+      <input list="roomSelect" name="myRoom" id="myRoom" value="">
+      <div id="roomSelect">
+      </div>
+      <div id="send">
+        <textarea id="messageBox"></textarea>
+        <button class="submit">Submit</button>
+      </div>
       <button class="btn" id="new">New Messages</button>
     </div>
     <div id="chats"></div>
