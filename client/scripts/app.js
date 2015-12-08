@@ -1,6 +1,7 @@
 // YOUR CODE HERE:
 $(document).ready(function(){
   var rooms = {};
+  var currentRoom = "default";
   var getMessages = function(){
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
@@ -33,7 +34,7 @@ $(document).ready(function(){
           
           $post.appendTo($("#chats"));
         }
-        
+
         // remove rooms from datalist
         $('.room').remove();
 
@@ -57,11 +58,26 @@ $(document).ready(function(){
     getMessages();
   });
 
+  $('#myRoom').on('input',function(e){
+    currentRoom = $(this).val();
+    // remove rooms from datalist
+    console.log(currentRoom);
+    $('.room').remove();
+
+    // add rooms to datalist
+    for(var room in rooms){
+      var $option = $('<option>');
+      $option.attr('value', room);
+      $option.addClass('room');
+      $option.appendTo($('datalist#roomList'));
+    }
+  });
+
   var postMessage = function(message){
     var ourPost = {
       username: window.location.search.slice(10),
       text: message,
-      room: 'default'
+      room: currentRoom,
     }
 
     $.ajax({
@@ -83,6 +99,7 @@ $(document).ready(function(){
     // if enter key is pressed
     if (event.keyCode === 13){
       // post message
+      postMessage($('#messageBox').val());
     }
   });
 
