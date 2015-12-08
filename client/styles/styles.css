@@ -59,20 +59,30 @@ form input[type=text] {
     padding: 5px;
 }
 
-.chat {
+
+.post {
     padding: 5px;
     margin-bottom: 5px;
     background-color: #eee;
 }
 
-.chat .username {
+.post .username {
     font-weight: 800;
 }
+.post .roomname{
+    padding: 5px;
+}
+.post .message{
 
-.chat:hover {
-    background-color: #ddd;
 }
 
+.post:hover {
+    background-color: #ddd;
+}
+.friended{
+    font-weight: 900;
+    background-color: pink;
+}
 .spinner {
     float: right;
     height: 46px;

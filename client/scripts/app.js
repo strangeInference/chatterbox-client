@@ -1,16 +1,31 @@
 // YOUR CODE HERE:
 var app = {};
+app.rooms = {};
+app.currentRoom = undefined;
 app.server = 'https://api.parse.com/1/classes/chatterbox';
 app.init = function(){
+  app.fetch(undefined);
+
   $(".username").on('click',function(){
     console.log("added friend");
     app.addFriend();
   });
 
-  
-  $('#send .submit').on('submit',function(){
+  $('#send .submit').on('click',function(){
     console.log("sumbitted");
     app.handleSubmit();
+    $('.post').remove();
+    app.fetch();
+  });
+
+ $('#new').on('click', function(){
+    // select all posts and remove them
+    $('.post').remove();
+    app.fetch(app.currentRoom);
+  });
+
+  $('#myRoom').on('input',function(e){
+    app.currentRoom = $(this).val();
   });
 };
 
@@ -31,16 +46,26 @@ app.send = function(ourPost){
   });
 };
 
-app.fetch = function(){
+app.fetch = function(currentRoom){
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: this.server,
     type: 'GET',
     success: function (data) {
+      for (var i = 0; i < data.results.length; i++){
+        if(data.results[i].roomname === currentRoom || currentRoom === undefined){
+          app.addMessage(data.results[i]);
+        }
+        app.rooms[data.results[i].roomname] = data.results[i].roomname;
+      }
+      $('.room').remove();
+      for(var room in app.rooms){
+        app.addRoom(room);
+      }
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.error('chatterbox: Failed to send message');
+      console.error('chatterbox: Failed to get messages');
     }
   });
 };
@@ -50,10 +75,18 @@ app.clearMessages = function(){
 };
 
 app.addRoom = function(roomName){
-  var $option = $('<option>');
-  $option.attr('value', roomName);
+  var $option = $('<div></div>');
+  $option.text(roomName);
   $option.addClass('room');
   $option.appendTo($('#roomSelect'));
+
+  $option.on('click', function(){
+    console.log('room' + $(this).text() + 'selected')
+    app.currentRoom = $(this).text();
+    $('.post').remove();
+    app.fetch(app.currentRoom);
+    $('#myRoom').val(app.currentRoom);
+  });
 }
 
 // var message = {
@@ -69,6 +102,9 @@ app.addMessage = function(message){
   $username.text(message.username);
   $username.addClass('username');
   $username.appendTo($post);
+  $username.on('click',function(){
+    app.addFriend.call($(this));
+  });
 
   var $roomname = $('<span></span>');
   $roomname.text(message.roomname); 
@@ -85,11 +121,26 @@ app.addMessage = function(message){
 
 app.addFriend = function(){
   console.log('added friend');
+  var friendName = this.text();
+  $('.username').each(function(index, element){
+    if ($(element).text() === friendName){
+      $(element).parent().addClass('friended');
+    }
+  });
+  
 };
 
 app.handleSubmit = function(){
   console.log('submitted');
+  ourPost = {
+    username: window.location.search.slice(10),
+    roomname: app.currentRoom,
+    text: $('textarea').val(),
+  };
+  app.send(ourPost);
 };
+
+$(document).ready(app.init);
 
 // $(document).ready(function(){
 //   var rooms = {};
